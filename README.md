@@ -173,18 +173,6 @@ Can save jokes and view /saved-jokes
 
 ---
 
-## 🌐 Deployment (Vercel)
-
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com) and import your repository
-3. Add your environment variables in the Vercel dashboard:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-4. Add your Vercel production URL to Supabase **Redirect URLs**
-5. Deploy!
-
----
-
 ## 📄 License
 
 MIT
