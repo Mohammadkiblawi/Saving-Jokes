@@ -29,20 +29,13 @@ A fun Next.js web app that fetches random dad jokes and lets logged-in users sav
 
 ## 📦 Installation
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/your-username/dad-jokes.git
-cd dad-jokes
-```
-
-### 2. Install dependencies
+### 1. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Install Supabase packages
+### 2. Install Supabase packages
 
 ```bash
 npm install @supabase/supabase-js @supabase/ssr
@@ -74,7 +67,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 
 > ⚠️ Never commit this file. It is already listed in `.gitignore`.
 
-### 4. Create the database table
+### 3. Create the database table
 
 In your Supabase dashboard, go to **SQL Editor** and run the following:
 
@@ -95,21 +88,16 @@ on saved_jokes for all
 using (auth.uid() = user_id);
 ```
 
-### 5. Configure allowed redirect URLs
+### 4. Configure allowed redirect URLs
 
 - In Supabase go to **Authentication → URL Configuration**
 - Under **Redirect URLs**, add:
   - `http://localhost:3000/**` (for local development)
   - `https://your-production-domain.com/**` (when you deploy)
 
-### 6. (Optional) Increase email rate limit
+### 5. (Optional) Increase email rate limit
 
-By default Supabase allows only 3 magic link emails per hour during development.
-
-- Go to **Authentication → Rate Limits**
-- Increase the **Emails sent per hour** value
-
----
+By default Supabase allows only 2 magic link emails per hour during development.
 
 ## 📁 Project Structure
 
