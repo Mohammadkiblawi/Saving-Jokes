@@ -1,36 +1,190 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 😄 Dad Jokes App
 
-## Getting Started
+A fun Next.js web app that fetches random dad jokes and lets logged-in users save their favorites. Authentication is handled via Supabase magic links (passwordless email login).
 
-First, run the development server:
+---
+
+## 🚀 Features
+
+- Random dad joke generator
+- Magic link authentication (no password needed)
+- Save favorite jokes (logged-in users only)
+- View all saved jokes on a dedicated page
+- Navbar shows login/logout state automatically
+- Guests can browse jokes but must log in to save them
+
+---
+
+## 🧰 Tech Stack & Dependencies
+
+| Library | Purpose |
+|---|---|
+| [Next.js 14](https://nextjs.org/) | React framework (App Router) |
+| [Tailwind CSS](https://tailwindcss.com/) | Utility-first styling |
+| [@supabase/supabase-js](https://supabase.com/docs/reference/javascript) | Supabase JS client |
+| [@supabase/ssr](https://supabase.com/docs/guides/auth/server-side/nextjs) | Supabase server-side rendering helpers |
+| [icanhazdadjoke API](https://icanhazdadjoke.com/api) | Free dad jokes API (no key needed) |
+
+---
+
+## 📦 Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/dad-jokes.git
+cd dad-jokes
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Install Supabase packages
+
+```bash
+npm install @supabase/supabase-js @supabase/ssr
+```
+
+---
+
+## 🔧 Supabase Setup
+
+### 1. Create a Supabase project
+
+- Go to [supabase.com](https://supabase.com) and sign in
+- Click **New Project** and give it a name
+- Wait for the project to be ready
+
+### 2. Get your API credentials
+
+- Go to **Project Settings → API**
+- Copy your **Project URL** and **anon public** key
+
+### 3. Create the `.env.local` file
+
+Create a `.env.local` file in the project root (same level as `package.json`):
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_project_url_here
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
+```
+
+> ⚠️ Never commit this file. It is already listed in `.gitignore`.
+
+### 4. Create the database table
+
+In your Supabase dashboard, go to **SQL Editor** and run the following:
+
+```sql
+create table saved_jokes (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade,
+  joke text not null,
+  created_at timestamp default now()
+);
+
+-- Enable Row Level Security
+alter table saved_jokes enable row level security;
+
+-- Only allow users to access their own jokes
+create policy "Users can manage their own jokes"
+on saved_jokes for all
+using (auth.uid() = user_id);
+```
+
+### 5. Configure allowed redirect URLs
+
+- In Supabase go to **Authentication → URL Configuration**
+- Under **Redirect URLs**, add:
+  - `http://localhost:3000/**` (for local development)
+  - `https://your-production-domain.com/**` (when you deploy)
+
+### 6. (Optional) Increase email rate limit
+
+By default Supabase allows only 3 magic link emails per hour during development.
+
+- Go to **Authentication → Rate Limits**
+- Increase the **Emails sent per hour** value
+
+---
+
+## 📁 Project Structure
+
+```
+dad-jokes/
+├── app/
+│   ├── auth/
+│   │   ├── callback/
+│   │   │   └── route.js        # Handles magic link redirect
+│   │   └── logout/
+│   │       └── route.js        # Handles sign out
+│   ├── components/
+│   │   ├── JokeFetcher.js      # Joke display + save button
+│   │   └── NavBar.js           # Navigation + login/logout state
+│   ├── login/
+│   │   └── page.js             # Magic link login form
+│   ├── saved-jokes/
+│   │   └── page.js             # Saved jokes page (auth required)
+│   ├── layout.js               # Root layout (includes NavBar)
+│   └── page.js                 # Home page
+├── utils/
+│   └── supabase/
+│       ├── client.js           # Browser Supabase client
+│       └── server.js           # Server Supabase client
+├── middleware.js                # Keeps session cookies fresh
+├── .env.local                  # Your secret keys (not committed)
+└── package.json
+```
+
+---
+
+## ▶️ Running the App
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 🔐 Authentication Flow
 
-## Learn More
+```
+User visits app
+      ↓
+Guests can browse jokes freely
+      ↓
+Click "Login to Save" or "Login" in navbar
+      ↓
+Enter email → Supabase sends a magic link
+      ↓
+User clicks the link in their email
+      ↓
+/auth/callback exchanges the code for a session
+      ↓
+Redirected to homepage, now logged in ✅
+      ↓
+Can save jokes and view /saved-jokes
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🌐 Deployment (Vercel)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com) and import your repository
+3. Add your environment variables in the Vercel dashboard:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Add your Vercel production URL to Supabase **Redirect URLs**
+5. Deploy!
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📄 License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+MIT
