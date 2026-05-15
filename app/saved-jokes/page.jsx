@@ -1,15 +1,20 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+import DeleteJokeButton from "../components/DeleteJokeBtn";
 
 export default async function SavedJokes() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     return (
       <main className="bg-gray-800 min-h-screen flex flex-col items-center justify-center text-center text-white p-4">
         <h1 className="text-2xl font-bold mb-4">Saved Jokes</h1>
-        <p className="text-gray-400 mb-4">You need to be logged in to view your saved jokes.</p>
+        <p className="text-gray-400 mb-4">
+          You need to be logged in to view your saved jokes.
+        </p>
         <Link
           href="/login"
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -33,8 +38,14 @@ export default async function SavedJokes() {
       ) : (
         <ul className="space-y-3 max-w-xl w-full">
           {savedJokes?.map((j) => (
-            <li key={j.id} className="bg-gray-700 rounded p-4 text-sm text-left">
-              {j.joke}
+            <li
+              key={j.id}
+              className="bg-gray-700 rounded p-4 text-sm flex items-center justify-between gap-4"
+            >
+              <span className="text-left flex-1">{j.joke}</span>
+              <div className="flex-shrink-0">
+                <DeleteJokeButton jokeId={j.id} />
+              </div>
             </li>
           ))}
         </ul>
